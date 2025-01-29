@@ -61,7 +61,6 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
                         folder: folder.toLowerCase().includes("spam") ? "Spam" : "Inbox",
                     };
 
-                    // Save email to MongoDB if not already present
                     const exists = await emailModel.findOne({
                         account: email.account,
                         subject: email.subject,
@@ -80,14 +79,15 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
             }
         }
 
-        // Maintain database limits
-        await maintainDatabase(emailModel);
-
         await client.logout();
         return allEmails;
     } catch (error) {
-        console.error(`Error fetching emails for ${user}:`, error);
-        throw error;
+        console.error(`Error fetching emails for ${user}:`, error.message);
+        return [];
+    } finally {
+        await client.logout().catch((logoutError) =>
+            console.warn(`Error during logout for ${user}:`, logoutError.message)
+        );
     }
 }
 

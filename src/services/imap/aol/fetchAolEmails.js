@@ -31,7 +31,6 @@ async function fetchAolEmails(user, pass, folders = ["Inbox", "Bulk"]) {
         auth: { user, pass },
     });
 
-    // Use a dedicated collection for each AOL account
     const collectionName = user.replace(/[@.]/g, "_");
     const EmailModel = mongoose.models[collectionName] || mongoose.model(collectionName, emailSchema);
 
@@ -76,14 +75,15 @@ async function fetchAolEmails(user, pass, folders = ["Inbox", "Bulk"]) {
             }
         }
 
-        // Maintain database limits
         await maintainDatabase(EmailModel);
-
-        await client.logout();
         return allEmails;
     } catch (error) {
-        console.error(`Error fetching emails for ${user}:`, error);
-        throw error;
+        console.error(`Error fetching AOL emails for ${user}:`, error.message);
+        return [];
+    } finally {
+        await client.logout().catch((logoutError) =>
+            console.warn(`Error during AOL logout for ${user}:`, logoutError.message)
+        );
     }
 }
 

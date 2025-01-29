@@ -31,7 +31,6 @@ async function fetchYandexEmails(user, pass, folders = ["Inbox", "Spam"]) {
         auth: { user, pass },
     });
 
-    // Use a dedicated collection for each Yandex account
     const collectionName = user.replace(/[@.]/g, "_");
     const EmailModel = mongoose.models[collectionName] || mongoose.model(collectionName, emailSchema);
 
@@ -79,11 +78,14 @@ async function fetchYandexEmails(user, pass, folders = ["Inbox", "Spam"]) {
         // Maintain database limits
         await maintainDatabase(EmailModel);
 
-        await client.logout();
         return allEmails;
     } catch (error) {
-        console.error(`Error fetching emails for ${user}:`, error);
-        throw error;
+        console.error(`Error fetching Yandex emails for ${user}:`, error.message);
+        return [];
+    } finally {
+        await client.logout().catch((logoutError) =>
+            console.warn(`Error during Yandex logout for ${user}:`, logoutError.message)
+        );
     }
 }
 

@@ -61,7 +61,6 @@ async function fetchYahooEmails(user, pass, folders = ["Inbox", "Bulk"]) {
                         folder: folder.toLowerCase().includes("bulk") ? "Spam" : "Inbox",
                     };
 
-                    // Save email to MongoDB if not already present
                     const exists = await emailModel.findOne({
                         account: email.account,
                         subject: email.subject,
@@ -83,11 +82,14 @@ async function fetchYahooEmails(user, pass, folders = ["Inbox", "Bulk"]) {
         // Maintain database limits
         await maintainDatabase(emailModel);
 
-        await client.logout();
         return allEmails;
     } catch (error) {
-        console.error(`Error fetching Yahoo emails for ${user}:`, error);
-        throw error;
+        console.error(`Error fetching Yahoo emails for ${user}:`, error.message);
+        return [];
+    } finally {
+        await client.logout().catch((logoutError) =>
+            console.warn(`Error during Yahoo logout for ${user}:`, logoutError.message)
+        );
     }
 }
 
