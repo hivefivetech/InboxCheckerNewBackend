@@ -65,7 +65,7 @@ setInterval(async () => {
     } catch (outerError) {
         console.error(`Unexpected error during Yahoo fetch loop:`, outerError.message);
     }
-}, 15000);
+}, 30000);
 
 // Zoho
 setInterval(async () => {
@@ -82,7 +82,7 @@ setInterval(async () => {
     } catch (outerError) {
         console.error(`Unexpected error during Gmail fetch loop:`, outerError.message);
     }
-}, 20000);
+}, 30000);
 
 // Yandex
 setInterval(async () => {
@@ -99,7 +99,7 @@ setInterval(async () => {
     } catch (outerError) {
         console.error(`Unexpected error during Gmail fetch loop:`, outerError.message);
     }
-}, 15000);
+}, 30000);
 
 setInterval(async () => {
     try {
@@ -115,7 +115,15 @@ setInterval(async () => {
     } catch (outerError) {
         console.error(`Unexpected error during Gmail fetch loop:`, outerError.message);
     }
-}, 15000);
+}, 30000);
+
+process.on('uncaughtException', (err) => {
+    console.error('Unhandled Exception:', err.message);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection:', reason);
+});
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {

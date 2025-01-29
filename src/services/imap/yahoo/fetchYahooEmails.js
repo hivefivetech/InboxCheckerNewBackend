@@ -36,6 +36,11 @@ async function fetchYahooEmails(user, pass, folders = ["Inbox", "Bulk"]) {
         auth: { user, pass },
     });
 
+    // Handle unexpected IMAP errors
+    client.on('error', (error) => {
+        console.error(`IMAP error for Yahoo account ${user}:`, error.message);
+    });
+
     const emailModel = getEmailModel(user);
 
     try {

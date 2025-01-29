@@ -31,6 +31,10 @@ async function fetchZohoEmails(user, pass, folders = ["Inbox", "Spam"]) {
         auth: { user, pass },
     });
 
+    client.on('error', (error) => {
+        console.error(`IMAP error for Zoho account ${user}:`, error.message);
+    });
+
     const collectionName = user.replace(/[@.]/g, "_");
     const EmailModel = mongoose.models[collectionName] || mongoose.model(collectionName, emailSchema);
 

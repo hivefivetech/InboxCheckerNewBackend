@@ -36,6 +36,10 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
         auth: { user, pass },
     });
 
+    client.on('error', (error) => {
+        console.error(`IMAP error for ${user}:`, error.message);
+    });
+
     const emailModel = getEmailModel(user);
 
     try {
@@ -61,6 +65,7 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
                         folder: folder.toLowerCase().includes("spam") ? "Spam" : "Inbox",
                     };
 
+                    // Save email to MongoDB if not already present
                     const exists = await emailModel.findOne({
                         account: email.account,
                         subject: email.subject,
@@ -78,6 +83,9 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
                 lock.release();
             }
         }
+
+        // Maintain database limits
+        await maintainDatabase(emailModel);
 
         await client.logout();
         return allEmails;

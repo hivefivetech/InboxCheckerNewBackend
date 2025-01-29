@@ -31,6 +31,10 @@ async function fetchAolEmails(user, pass, folders = ["Inbox", "Bulk"]) {
         auth: { user, pass },
     });
 
+    client.on('error', (error) => {
+        console.error(`IMAP error for AOL account ${user}:`, error.message);
+    });
+
     const collectionName = user.replace(/[@.]/g, "_");
     const EmailModel = mongoose.models[collectionName] || mongoose.model(collectionName, emailSchema);
 
