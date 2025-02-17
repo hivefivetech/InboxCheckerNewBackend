@@ -65,15 +65,16 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
                         folder: folder.toLowerCase().includes("spam") ? "Spam" : "Inbox",
                     };
 
-                    // Save email to MongoDB if not already present
-                    const exists = await emailModel.findOne({
+                    const existingEmail = await emailModel.findOne({
                         account: email.account,
                         subject: email.subject,
                         from: email.from,
                         date: email.date,
                     });
-
-                    if (!exists) {
+                    
+                    if (existingEmail && existingEmail.folder !== email.folder) {
+                        await emailModel.updateOne({ _id: existingEmail._id }, { $set: { folder: email.folder } });
+                    } else if (!existingEmail) {
                         await emailModel.create(email);
                     }
 
@@ -106,12 +107,11 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
 async function maintainDatabase(emailModel) {
     const totalEmails = await emailModel.countDocuments();
 
-    // If the total exceeds 30, remove the oldest emails
     if (totalEmails > 30) {
         const excessCount = totalEmails - 30;
         await emailModel
             .find({})
-            .sort({ date: 1 }) // Sort by the oldest first
+            .sort({ date: 1 })
             .limit(excessCount)
             .then((emails) => {
                 const idsToDelete = emails.map((email) => email._id);

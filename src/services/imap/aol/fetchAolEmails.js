@@ -61,16 +61,18 @@ async function fetchAolEmails(user, pass, folders = ["Inbox", "Bulk"]) {
                         folder: folder.toLowerCase().includes("bulk") ? "Spam" : "Inbox",
                     };
 
-                    const exists = await EmailModel.findOne({
+                    const existingEmail = await EmailModel.findOne({
                         account: email.account,
                         subject: email.subject,
                         from: email.from,
                         date: email.date,
                     });
-
-                    if (!exists) {
+                    
+                    if (existingEmail && existingEmail.folder !== email.folder) {
+                        await EmailModel.updateOne({ _id: existingEmail._id }, { $set: { folder: email.folder } });
+                    } else if (!existingEmail) {
                         await EmailModel.create(email);
-                    }
+                    }                    
 
                     allEmails.push(email);
                 }

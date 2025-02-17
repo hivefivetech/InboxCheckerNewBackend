@@ -66,16 +66,19 @@ async function fetchYahooEmails(user, pass, folders = ["Inbox", "Bulk"]) {
                         folder: folder.toLowerCase().includes("bulk") ? "Spam" : "Inbox",
                     };
 
-                    const exists = await emailModel.findOne({
+                    const existingEmail = await emailModel.findOne({
                         account: email.account,
                         subject: email.subject,
                         from: email.from,
                         date: email.date,
                     });
-
-                    if (!exists) {
+                    
+                    // If email exists but the folder changed, update it
+                    if (existingEmail && existingEmail.folder !== email.folder) {
+                        await emailModel.updateOne({ _id: existingEmail._id }, { $set: { folder: email.folder } });
+                    } else if (!existingEmail) {
                         await emailModel.create(email);
-                    }
+                    }                    
 
                     allEmails.push(email);
                 }
@@ -105,12 +108,11 @@ async function fetchYahooEmails(user, pass, folders = ["Inbox", "Bulk"]) {
 async function maintainDatabase(emailModel) {
     const totalEmails = await emailModel.countDocuments();
 
-    // If the total exceeds 30, remove the oldest emails one by one
     if (totalEmails > 30) {
         const excessCount = totalEmails - 30;
         await emailModel
             .find({})
-            .sort({ date: 1 }) // Sort by the oldest first
+            .sort({ date: 1 })
             .limit(excessCount)
             .then((emails) => {
                 const idsToDelete = emails.map((email) => email._id);
@@ -118,7 +120,6 @@ async function maintainDatabase(emailModel) {
             });
     }
 
-    // Ensure a minimum of 10 emails remain
     const currentCount = await emailModel.countDocuments();
     if (currentCount < 10) {
         console.warn("Warning: Email count dropped below 10!");
