@@ -8,7 +8,7 @@ dotenv.config();
 connectDB();
 
 // Cron Job
-require("./analyticsCron");
+// require("./analyticsCron");
 
 const server = http.createServer(app);
 const io = new Server(server);
