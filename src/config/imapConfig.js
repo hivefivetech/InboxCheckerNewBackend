@@ -13,6 +13,7 @@ const gmailAccounts = [
 const yahooAccounts = [
     { user: process.env.IMAP_USER_YAHOO_FIRST, pass: process.env.IMAP_PASSWORD_YAHOO_FIRST },
     { user: process.env.IMAP_USER_YAHOO_SECOND, pass: process.env.IMAP_PASSWORD_YAHOO_SECOND },
+    { user: process.env.IMAP_USER_YAHOO_THIRD, pass: process.env.IMAP_PASSWORD_YAHOO_THIRD },
 ];
 
 const zohoAccounts = [
