@@ -46,6 +46,7 @@ async function fetchYahooEmails(user, pass, folders = ["Inbox", "Bulk"]) {
     try {
         await client.connect();
         const allEmails = [];
+        const fetchedEmailKeys = [];
 
         for (const folder of folders) {
             const lock = await client.getMailboxLock(folder);
@@ -72,15 +73,21 @@ async function fetchYahooEmails(user, pass, folders = ["Inbox", "Bulk"]) {
                         from: email.from,
                         date: email.date,
                     });
-                    
+
                     // If email exists but the folder changed, update it
                     if (existingEmail && existingEmail.folder !== email.folder) {
                         await emailModel.updateOne({ _id: existingEmail._id }, { $set: { folder: email.folder } });
                     } else if (!existingEmail) {
                         await emailModel.create(email);
-                    }                    
+                    }
 
                     allEmails.push(email);
+                    fetchedEmailKeys.push({
+                        account: email.account,
+                        subject: email.subject,
+                        from: email.from,
+                        date: email.date,
+                    });
                 }
             } finally {
                 lock.release();
@@ -89,6 +96,13 @@ async function fetchYahooEmails(user, pass, folders = ["Inbox", "Bulk"]) {
 
         // Maintain database limits
         await maintainDatabase(emailModel);
+
+        await emailModel.deleteMany({
+            $and: [
+                { account: user },
+                { $nor: fetchedEmailKeys }
+            ]
+        });
 
         return allEmails;
     } catch (error) {

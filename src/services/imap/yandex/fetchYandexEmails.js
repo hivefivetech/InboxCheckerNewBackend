@@ -41,6 +41,7 @@ async function fetchYandexEmails(user, pass, folders = ["Inbox", "Spam"]) {
     try {
         await client.connect();
         const allEmails = [];
+        const fetchedEmailKeys = [];
 
         for (const folder of folders) {
             const lock = await client.getMailboxLock(folder);
@@ -67,14 +68,20 @@ async function fetchYandexEmails(user, pass, folders = ["Inbox", "Spam"]) {
                         from: email.from,
                         date: email.date,
                     });
-                    
+
                     if (existingEmail && existingEmail.folder !== email.folder) {
                         await EmailModel.updateOne({ _id: existingEmail._id }, { $set: { folder: email.folder } });
                     } else if (!existingEmail) {
                         await EmailModel.create(email);
-                    }                    
+                    }
 
                     allEmails.push(email);
+                    fetchedEmailKeys.push({
+                        account: email.account,
+                        subject: email.subject,
+                        from: email.from,
+                        date: email.date,
+                    });
                 }
             } finally {
                 lock.release();
@@ -83,6 +90,13 @@ async function fetchYandexEmails(user, pass, folders = ["Inbox", "Spam"]) {
 
         // Maintain database limits
         await maintainDatabase(EmailModel);
+
+        await EmailModel.deleteMany({
+            $and: [
+                { account: user },
+                { $nor: fetchedEmailKeys }
+            ]
+        });
 
         return allEmails;
     } catch (error) {

@@ -45,6 +45,7 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
     try {
         await client.connect();
         const allEmails = [];
+        const fetchedEmailKeys = [];
 
         for (const folder of folders) {
             const lock = await client.getMailboxLock(folder);
@@ -79,6 +80,12 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
                     }
 
                     allEmails.push(email);
+                    fetchedEmailKeys.push({
+                        account: email.account,
+                        subject: email.subject,
+                        from: email.from,
+                        date: email.date,
+                    });
                 }
             } finally {
                 lock.release();
@@ -87,6 +94,13 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
 
         // Maintain database limits
         await maintainDatabase(emailModel);
+
+        await emailModel.deleteMany({
+            $and: [
+                { account: user },
+                { $nor: fetchedEmailKeys }
+            ]
+        });        
 
         await client.logout();
         return allEmails;

@@ -41,6 +41,7 @@ async function fetchZohoEmails(user, pass, folders = ["Inbox", "Spam"]) {
     try {
         await client.connect();
         const allEmails = [];
+        const fetchedEmailKeys = [];
 
         for (const folder of folders) {
             const lock = await client.getMailboxLock(folder);
@@ -75,6 +76,12 @@ async function fetchZohoEmails(user, pass, folders = ["Inbox", "Spam"]) {
                     }                    
 
                     allEmails.push(email);
+                    fetchedEmailKeys.push({
+                        account: email.account,
+                        subject: email.subject,
+                        from: email.from,
+                        date: email.date,
+                    });
                 }
             } finally {
                 lock.release();
@@ -82,6 +89,14 @@ async function fetchZohoEmails(user, pass, folders = ["Inbox", "Spam"]) {
         }
 
         await maintainDatabase(EmailModel);
+
+        await EmailModel.deleteMany({
+            $and: [
+                { account: user },
+                { $nor: fetchedEmailKeys }
+            ]
+        });
+
         return allEmails;
     } catch (error) {
         console.error(`Error fetching emails for ${user}:`, error.message);
