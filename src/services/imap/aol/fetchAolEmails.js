@@ -109,8 +109,8 @@ async function fetchAolEmails(user, pass, folders = ["Inbox", "Bulk"]) {
 }
 
 /**
- * Ensure the database maintains a maximum of 30 emails and a minimum of 10 emails.
- * @param {mongoose.Model} EmailModel - Mongoose model for the collection.
+ * Ensure the database maintains a maximum of 30 emails and a minimum of 10 emails
+ * @param {mongoose.Model} EmailModel - Mongoose model for the collection
  */
 async function maintainDatabase(EmailModel) {
     const totalEmails = await EmailModel.countDocuments();

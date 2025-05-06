@@ -29,6 +29,7 @@ const yandexAccounts = [
 
 const aolAccounts = [
     { user: process.env.IMAP_USER_AOL_FIRST, pass: process.env.IMAP_PASSWORD_AOL_FIRST },
+    { user: process.env.IMAP_USER_AOL_SECOND, pass: process.env.IMAP_PASSWORD_AOL_SECOND },
 ];
 
 module.exports = { gmailAccounts, yahooAccounts, zohoAccounts, yandexAccounts, aolAccounts };
