@@ -55,7 +55,7 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
 
                 if (totalMessages === 0) continue;
 
-                const fetchRange = totalMessages > 5 ? `${totalMessages - 4}:*` : "1:*";
+                const fetchRange = totalMessages > 7 ? `${totalMessages - 6}:*` : "1:*";
                 for await (const message of client.fetch(fetchRange, { envelope: true })) {
                     const email = {
                         account: user,
@@ -72,7 +72,7 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
                         from: email.from,
                         date: email.date,
                     });
-                    
+
                     if (existingEmail && existingEmail.folder !== email.folder) {
                         await emailModel.updateOne({ _id: existingEmail._id }, { $set: { folder: email.folder } });
                     } else if (!existingEmail) {
@@ -92,6 +92,16 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
             }
         }
 
+        // const existingDocs = await emailModel.find({ account: user });
+        // const fetchedKeysSet = new Set(fetchedEmailKeys.map(key => `${key.subject}-${key.from}-${key.date.toISOString()}`));
+
+        // for (const doc of existingDocs) {
+        //     const docKey = `${doc.subject}-${doc.from}-${doc.date.toISOString()}`;
+        //     if (!fetchedKeysSet.has(docKey)) {
+        //         await emailModel.deleteOne({ _id: doc._id });
+        //     }
+        // }
+
         // Maintain database limits
         await maintainDatabase(emailModel);
 
@@ -100,7 +110,7 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
                 { account: user },
                 { $nor: fetchedEmailKeys }
             ]
-        });        
+        });
 
         await client.logout();
         return allEmails;
@@ -133,7 +143,6 @@ async function maintainDatabase(emailModel) {
             });
     }
 
-    // Ensure a minimum of 10 emails remain
     const currentCount = await emailModel.countDocuments();
     if (currentCount < 10) {
         console.warn("Warning: Email count dropped below 10!");

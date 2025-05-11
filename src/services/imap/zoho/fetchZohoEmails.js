@@ -51,7 +51,7 @@ async function fetchZohoEmails(user, pass, folders = ["Inbox", "Spam"]) {
 
                 if (totalMessages === 0) continue;
 
-                const fetchRange = totalMessages > 5 ? `${totalMessages - 4}:*` : "1:*";
+                const fetchRange = totalMessages > 7 ? `${totalMessages - 6}:*` : "1:*";
                 for await (const message of client.fetch(fetchRange, { envelope: true })) {
                     const email = {
                         account: user,
@@ -87,6 +87,16 @@ async function fetchZohoEmails(user, pass, folders = ["Inbox", "Spam"]) {
                 lock.release();
             }
         }
+
+                // const existingDocs = await emailModel.find({ account: user });
+        // const fetchedKeysSet = new Set(fetchedEmailKeys.map(key => `${key.subject}-${key.from}-${key.date.toISOString()}`));
+
+        // for (const doc of existingDocs) {
+        //     const docKey = `${doc.subject}-${doc.from}-${doc.date.toISOString()}`;
+        //     if (!fetchedKeysSet.has(docKey)) {
+        //         await emailModel.deleteOne({ _id: doc._id });
+        //     }
+        // }
 
         await maintainDatabase(EmailModel);
 
