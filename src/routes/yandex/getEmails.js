@@ -28,6 +28,7 @@ router.get("/:email", async (req, res) => {
     } catch (error) {
         console.error(`Error fetching emails for ${email}:`, error.message);
         res.status(500).json({ success: false, message: "Failed to fetch emails." });
+        return;
     }
 });
 

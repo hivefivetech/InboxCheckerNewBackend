@@ -104,6 +104,7 @@ setInterval(async () => {
     }
 }, 30000);
 
+// Aol
 setInterval(async () => {
     try {
         for (const account of aolAccounts) {
