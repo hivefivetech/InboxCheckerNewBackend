@@ -88,25 +88,7 @@ async function fetchYandexEmails(user, pass, folders = ["Inbox", "Spam"]) {
             }
         }
 
-                // const existingDocs = await emailModel.find({ account: user });
-        // const fetchedKeysSet = new Set(fetchedEmailKeys.map(key => `${key.subject}-${key.from}-${key.date.toISOString()}`));
-
-        // for (const doc of existingDocs) {
-        //     const docKey = `${doc.subject}-${doc.from}-${doc.date.toISOString()}`;
-        //     if (!fetchedKeysSet.has(docKey)) {
-        //         await emailModel.deleteOne({ _id: doc._id });
-        //     }
-        // }
-
-        // Maintain database limits
         await maintainDatabase(EmailModel);
-
-        await EmailModel.deleteMany({
-            $and: [
-                { account: user },
-                { $nor: fetchedEmailKeys }
-            ]
-        });
 
         return allEmails;
     } catch (error) {
