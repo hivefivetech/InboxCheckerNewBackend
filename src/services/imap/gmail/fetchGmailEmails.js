@@ -55,7 +55,7 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
 
                 if (totalMessages === 0) continue;
 
-                const fetchRange = totalMessages > 10 ? `${totalMessages - 9}:*` : "1:*";
+                const fetchRange = totalMessages > 5 ? `${totalMessages - 4}:*` : "1:*";
                 for await (const message of client.fetch(fetchRange, { envelope: true })) {
                     const email = {
                         account: user,
@@ -91,8 +91,15 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
                 lock.release();
             }
         }
-        
+
         await maintainDatabase(emailModel);
+
+        await emailModel.deleteMany({
+            $and: [
+                { account: user },
+                { $nor: fetchedEmailKeys }
+            ]
+        });
 
         await client.logout();
         return allEmails;

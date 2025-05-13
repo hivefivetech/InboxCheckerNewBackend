@@ -56,7 +56,7 @@ async function fetchYahooEmails(user, pass, folders = ["Inbox", "Bulk"]) {
 
                 if (totalMessages === 0) continue;
 
-                const fetchRange = totalMessages > 7 ? `${totalMessages - 6}:*` : "1:*";
+                const fetchRange = totalMessages > 5 ? `${totalMessages - 4}:*` : "1:*";
                 for await (const message of client.fetch(fetchRange, { envelope: true })) {
                     const email = {
                         account: user,
@@ -95,6 +95,13 @@ async function fetchYahooEmails(user, pass, folders = ["Inbox", "Bulk"]) {
         }
 
         await maintainDatabase(emailModel);
+
+        await emailModel.deleteMany({
+            $and: [
+                { account: user },
+                { $nor: fetchedEmailKeys }
+            ]
+        });
 
         return allEmails;
     } catch (error) {

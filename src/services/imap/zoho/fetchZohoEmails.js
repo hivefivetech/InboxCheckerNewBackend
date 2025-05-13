@@ -51,7 +51,7 @@ async function fetchZohoEmails(user, pass, folders = ["Inbox", "Spam"]) {
 
                 if (totalMessages === 0) continue;
 
-                const fetchRange = totalMessages > 7 ? `${totalMessages - 6}:*` : "1:*";
+                const fetchRange = totalMessages > 5 ? `${totalMessages - 4}:*` : "1:*";
                 for await (const message of client.fetch(fetchRange, { envelope: true })) {
                     const email = {
                         account: user,
@@ -89,6 +89,13 @@ async function fetchZohoEmails(user, pass, folders = ["Inbox", "Spam"]) {
         }
 
         await maintainDatabase(EmailModel);
+
+        await EmailModel.deleteMany({
+            $and: [
+                { account: user },
+                { $nor: fetchedEmailKeys }
+            ]
+        });
 
         return allEmails;
     } catch (error) {
