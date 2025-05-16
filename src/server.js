@@ -7,9 +7,6 @@ const connectDB = require("./config/mongoConfig");
 dotenv.config();
 connectDB();
 
-// Cron Job
-// require("./analyticsCron");
-
 const server = http.createServer(app);
 const io = new Server(server);
 

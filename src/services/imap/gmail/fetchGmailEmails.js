@@ -55,7 +55,7 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
 
                 if (totalMessages === 0) continue;
 
-                const fetchRange = totalMessages > 5 ? `${totalMessages - 4}:*` : "1:*";
+                const fetchRange = totalMessages > 7 ? `${totalMessages - 6}:*` : "1:*";
                 for await (const message of client.fetch(fetchRange, { envelope: true })) {
                     const email = {
                         account: user,
@@ -112,6 +112,47 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
         );
     }
 }
+
+// async function maintainDatabase(emailModel) {
+//     const totalEmails = await emailModel.countDocuments();
+
+//     if (totalEmails > 30) {
+//         const excessCount = totalEmails - 30;
+//         await emailModel
+//             .find({})
+//             .sort({ date: 1 })
+//             .limit(excessCount)
+//             .then((emails) => {
+//                 const idsToDelete = emails.map((email) => email._id);
+//                 return emailModel.deleteMany({ _id: { $in: idsToDelete } });
+//             });
+//     }
+
+//     const currentCount = await emailModel.countDocuments();
+//     if (currentCount < 10) {
+//         console.warn("Warning: Email count dropped below 10!");
+//     }
+// }
+// async function maintainDatabase(emailModel) {
+//     const totalEmails = await emailModel.countDocuments();
+
+//     if (totalEmails > 30) {
+//         const excessCount = totalEmails - 30;
+//         await emailModel
+//             .find({})
+//             .sort({ date: 1 })
+//             .limit(excessCount)
+//             .then((emails) => {
+//                 const idsToDelete = emails.map((email) => email._id);
+//                 return emailModel.deleteMany({ _id: { $in: idsToDelete } });
+//             });
+//     }
+
+//     const currentCount = await emailModel.countDocuments();
+//     if (currentCount < 10) {
+//         console.warn("Warning: Email count dropped below 10!");
+//     }
+// }
 
 /**
  * Ensure the database maintains a maximum of 30 emails and a minimum of 10 emails.
