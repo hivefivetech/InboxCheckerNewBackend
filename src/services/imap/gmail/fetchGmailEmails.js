@@ -94,12 +94,12 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
 
         await maintainDatabase(emailModel);
 
-        await emailModel.deleteMany({
-            $and: [
-                { account: user },
-                { $nor: fetchedEmailKeys }
-            ]
-        });
+        // await emailModel.deleteMany({
+        //     $and: [
+        //         { account: user },
+        //         { $nor: fetchedEmailKeys }
+        //     ]
+        // });
 
         await client.logout();
         return allEmails;

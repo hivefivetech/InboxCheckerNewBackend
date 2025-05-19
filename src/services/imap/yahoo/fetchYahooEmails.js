@@ -96,12 +96,12 @@ async function fetchYahooEmails(user, pass, folders = ["Inbox", "Bulk"]) {
 
         await maintainDatabase(emailModel);
 
-        await emailModel.deleteMany({
-            $and: [
-                { account: user },
-                { $nor: fetchedEmailKeys }
-            ]
-        });
+        // await emailModel.deleteMany({
+        //     $and: [
+        //         { account: user },
+        //         { $nor: fetchedEmailKeys }
+        //     ]
+        // });
 
         return allEmails;
     } catch (error) {
