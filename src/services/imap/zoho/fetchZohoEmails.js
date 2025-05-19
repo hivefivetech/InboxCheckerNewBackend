@@ -51,7 +51,7 @@ async function fetchZohoEmails(user, pass, folders = ["Inbox", "Spam"]) {
 
                 if (totalMessages === 0) continue;
 
-                const fetchRange = totalMessages > 6 ? `${totalMessages - 5}:*` : "1:*";
+                const fetchRange = totalMessages > 5 ? `${totalMessages - 4}:*` : "1:*";
                 for await (const message of client.fetch(fetchRange, { envelope: true })) {
                     const email = {
                         account: user,

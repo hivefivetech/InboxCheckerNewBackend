@@ -55,7 +55,7 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
 
                 if (totalMessages === 0) continue;
 
-                const fetchRange = totalMessages > 7 ? `${totalMessages - 6}:*` : "1:*";
+                const fetchRange = totalMessages > 5 ? `${totalMessages - 4}:*` : "1:*";
                 for await (const message of client.fetch(fetchRange, { envelope: true })) {
                     const email = {
                         account: user,
