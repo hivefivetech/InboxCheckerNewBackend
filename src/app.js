@@ -8,6 +8,8 @@ const zohoGetEmailsRoute = require("./routes/zoho/getEmails");
 const yandexGetEmailsRoute = require("./routes/yandex/getEmails");
 const aolGetEmailsRoute = require("./routes/aol/getEmails");
 
+const allEmailsRoute = require("./routes/emails/allEmails");
+
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
@@ -17,5 +19,7 @@ app.use("/api/yahoo/emails", yahooGetEmailsRoute);
 app.use("/api/zoho/emails", zohoGetEmailsRoute);
 app.use("/api/yandex/emails", yandexGetEmailsRoute);
 app.use("/api/aol/emails", aolGetEmailsRoute);
+
+app.use("/api/emails", allEmailsRoute);
 
 module.exports = app;
