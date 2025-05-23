@@ -103,6 +103,13 @@ async function fetchYahooEmails(user, pass, folders = ["Inbox", "Bulk"]) {
         //     ]
         // });
 
+         // await EmailModel.deleteMany({
+        //     $nor: [
+        //         { account: user },
+        //         { $and $nor: fetchedEmailKeys }
+        //     ]
+        // });
+
         return allEmails;
     } catch (error) {
         console.error(`Error fetching Yahoo emails for ${user}:`, error.message);

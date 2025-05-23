@@ -101,6 +101,13 @@ async function fetchEmails(user, pass, folders = ["Inbox", "[Gmail]/Spam"]) {
         //     ]
         // });
 
+         // await EmailModel.deleteMany({
+        //     $nor: [
+        //         { account: user },
+        //         { $and $nor: fetchedEmailKeys }
+        //     ]
+        // });
+
         await client.logout();
         return allEmails;
     } catch (error) {

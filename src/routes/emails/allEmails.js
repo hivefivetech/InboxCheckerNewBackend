@@ -40,7 +40,7 @@ router.get("/all", async (req, res) => {
 
         for (const email of allEmailsList) {
             const model = getEmailModel(email);
-            const emails = await model.find({}).sort({ date: -1 }).limit(15);
+            const emails = await model.find({}).sort({ date: -1 }).limit(25);
             results[email] = emails;
         }
 

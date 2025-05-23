@@ -97,6 +97,13 @@ async function fetchYandexEmails(user, pass, folders = ["Inbox", "Spam"]) {
         //     ]
         // });
 
+         // await EmailModel.deleteMany({
+        //     $nor: [
+        //         { account: user },
+        //         { $and $nor: fetchedEmailKeys }
+        //     ]
+        // });
+
         return allEmails;
     } catch (error) {
         console.error(`Error fetching Yandex emails for ${user}:`, error.message);

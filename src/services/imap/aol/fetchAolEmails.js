@@ -96,6 +96,13 @@ async function fetchAolEmails(user, pass, folders = ["Inbox", "Bulk"]) {
         //         { $nor: fetchedEmailKeys }
         //     ]
         // });
+
+        // await EmailModel.deleteMany({
+        //     $nor: [
+        //         { account: user },
+        //         { $and $nor: fetchedEmailKeys }
+        //     ]
+        // });
         
         return allEmails;
     } catch (error) {
