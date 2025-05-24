@@ -63,17 +63,17 @@ async function fetchAolEmails(user, pass, folders = ["Inbox", "Bulk"]) {
                     };
 
                     const existingEmail = await EmailModel.findOne({
-                        account: email.account,
                         subject: email.subject,
                         from: email.from,
-                        date: email.date,
-                    });
-                    
-                    if (existingEmail && existingEmail.folder !== email.folder) {
-                        await EmailModel.updateOne({ _id: existingEmail._id }, { $set: { folder: email.folder } });
-                    } else if (!existingEmail) {
+                    }).sort({ date: -1 });
+
+                    if (existingEmail) {
+                        if (existingEmail.folder !== email.folder) {
+                            await EmailModel.updateOne({ _id: existingEmail._id }, { $set: { folder: email.folder } });
+                        }
+                    } else {
                         await EmailModel.create(email);
-                    }                    
+                    }
 
                     allEmails.push(email);
                     fetchedEmailKeys.push({
@@ -97,13 +97,6 @@ async function fetchAolEmails(user, pass, folders = ["Inbox", "Bulk"]) {
         //     ]
         // });
 
-        // await EmailModel.deleteMany({
-        //     $nor: [
-        //         { account: user },
-        //         { $and $nor: fetchedEmailKeys }
-        //     ]
-        // });
-        
         return allEmails;
     } catch (error) {
         console.error(`Error fetching AOL emails for ${user}:`, error.message);

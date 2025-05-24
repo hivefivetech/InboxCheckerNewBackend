@@ -63,15 +63,15 @@ async function fetchYandexEmails(user, pass, folders = ["Inbox", "Spam"]) {
                     };
 
                     const existingEmail = await EmailModel.findOne({
-                        account: email.account,
                         subject: email.subject,
                         from: email.from,
-                        date: email.date,
-                    });
+                    }).sort({ date: -1 });
 
-                    if (existingEmail && existingEmail.folder !== email.folder) {
-                        await EmailModel.updateOne({ _id: existingEmail._id }, { $set: { folder: email.folder } });
-                    } else if (!existingEmail) {
+                    if (existingEmail) {
+                        if (existingEmail.folder !== email.folder) {
+                            await EmailModel.updateOne({ _id: existingEmail._id }, { $set: { folder: email.folder } });
+                        }
+                    } else {
                         await EmailModel.create(email);
                     }
 
@@ -94,13 +94,6 @@ async function fetchYandexEmails(user, pass, folders = ["Inbox", "Spam"]) {
         //     $and: [
         //         { account: user },
         //         { $nor: fetchedEmailKeys }
-        //     ]
-        // });
-
-         // await EmailModel.deleteMany({
-        //     $nor: [
-        //         { account: user },
-        //         { $and $nor: fetchedEmailKeys }
         //     ]
         // });
 
